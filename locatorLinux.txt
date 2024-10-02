@@ -1,0 +1,74 @@
+old_IFS=$IFS
+
+if [ ! -n "$1" ]; then 
+	echo Enter the argument in the blank.
+	exit 0
+fi
+
+#check liscence
+
+if [ "$1" = "/?" ]; then 
+	echo This script is the finder of subjects in the argument and it returns 
+	echo it if it is either an external command, or enternal command, or exectutable file. 
+	exit 0
+fi
+
+
+#check Help 
+
+
+for a in $(compgen -b -k); do
+	if [ "$a" = "$1" ]; then 
+	echo $1 is an internal command. 
+	exit 0
+	fi
+done
+
+
+#check Bin
+
+
+for a in $(ls /bin/); do
+	if [ "$a" = "$1" ]; then 
+	echo $1 is an external command. 
+	exit 0
+	fi
+done
+
+
+#check current dir
+
+
+for a in $(ls -l -a); do
+	if [ "$1" = "$a" ]; then
+		if [ -x "$1" ] && [ -f "$1" ]; then
+			echo $1 is an exectubale file.
+			echo $(pwd)
+			exit 0
+		fi
+	fi
+done
+
+
+#check PATH
+
+IFS=:
+for a in  $PATH; do
+	IFS=$old_IFS
+	cd $a
+	for b in $(ls); do
+		if [ "$b" = "$1" ]; then
+			if [ -x "$1" ] && [ -f "$1" ]; then
+			echo $1 is an exectubale file.
+			echo $a
+			exit 0
+			fi
+		fi
+	done
+done
+
+echo The entered name of your file is not correct.
+echo Try to enter the name of the file again. 
+
+
+
